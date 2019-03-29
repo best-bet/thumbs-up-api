@@ -61,7 +61,7 @@ the content's thumbnails.
 
 thumbs up utilizes machine learning to help you find the most clickable
 thumbnail out of a set that you provide based on real world interactions
-with your users. This can significanly increase traffic to your products!
+with your users. This can significantly increase traffic to your products!
 
 .. _What-is-the-Multi-Armed-Bandit-Algorithm?:
 
