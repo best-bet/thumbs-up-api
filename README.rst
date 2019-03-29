@@ -12,7 +12,7 @@ Public API for the  optimization of traffic using ML
 :Source: https://github.com/best-bet/thumbs-up-api
 :Keywords: thumbnail, a/b_testing, multi_armed_bandit, python, api
 
---
+----
 
 .. _What is thumbs up?:
 
