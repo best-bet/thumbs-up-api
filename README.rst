@@ -85,9 +85,13 @@ This is the “multi-armed bandit problem.”
 
 More at:
 
-.. _`Optimizely`: https://www.optimizely.com/optimization-glossary/multi-armed-bandit/
+`Optimizely`_
 
 Also:
+
+`Wikipedia`_
+
+.. _`Optimizely`: https://www.optimizely.com/optimization-glossary/multi-armed-bandit/
 
 .. _`Wikipedia`: https://en.wikipedia.org/wiki/Multi-armed_bandit
 

@@ -12,7 +12,7 @@ import os
 from flask import Flask
 from flask_cors import CORS
 
-from .database import connect_db
+from .database import connect_db, Project
 
 # TODO: Connect to api
 
@@ -25,7 +25,7 @@ def create_app():
     app.config.from_object(f"config.{str.capitalize(os.environ['FLASK_ENV'])}Config")
 
     # Create db connection
-    db, models = connect_db(app)
+    db_session = connect_db(app)
 
     # Setup CORS headers to allow all domains
     CORS(app)
@@ -35,20 +35,20 @@ def create_app():
         """possibly temporary route / debugging route"""
         return f"<div>app root</div>"
 
-    @app.route("/api/")
-    def api():
-        """How to run this"""
-
-        # TODO: connect api
-
-        # connect to api.projects here...
-        return "<h1>api</h1>"
+    # @app.route("/api/")
+    # def api():
+    #     """How to run this"""
+    #
+    #     # TODO: connect api
+    #
+    #     # connect to api.projects here...
+    #     return "<h1>api</h1>"
 
     @app.route("/api/projects/<id>")
-    def api():
+    def api(id: str):
         """test"""
 
-        project = models["Project"].query(1)
+        project = Project.query.get(int(id))
 
         return f"<h1>{project.email}</h1>"
 
