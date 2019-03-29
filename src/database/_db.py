@@ -1,25 +1,36 @@
 #!/usr/bin/env python3
 """Database declaration file"""
 
-from typing import Tuple
-
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from sqlalchemy import create_engine
+from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
-from .models import register_models
-
-# TODO: Fix error with GUID during migration
+# TODO: flask_migrate wont work because we are using raw sqlalchemy instead of flask_sqlalchemy, find a replacement
 
 
-def connect_db(app: Flask) -> Tuple[SQLAlchemy, dict]:
-    """Create an instance of the database and connect it to the app."""
-    database = SQLAlchemy(app)
+# Declare in module's scope to import in .models
+Base = declarative_base()
+
+
+def connect_db(app: Flask) -> scoped_session:
+    """Create a connection to the database, migrate changes and register the models."""
+
+    # Connect to database
+    engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"], convert_unicode=True)
+
+    # Bind session to db connection --- this is connection used by API
+    db_session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=False))
+
+    # Create Base query and Base metadata
+    Base.query = db_session.query_property()
+    Base.metadata.create_all(bind=engine)
 
     # Migrate changes in schema into database
-    Migrate(app, database)
+    Migrate(app, engine)
 
-    # Pass the new connection to the db to register the models with the db
-    models = register_models(database)
+    # Register models
+    from .models import Project, Item, Option
 
-    return database, models
+    return db_session

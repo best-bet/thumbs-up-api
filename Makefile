@@ -26,7 +26,7 @@ db-init:
 		flask db init
 
 seed:
-		FLASK_APP=scripts.seed:seed_db flask run
+		FLASK_APP=scripts.seed:seed_db flask run --no-reload
 
 run:
 		FLASK_ENV=development FLASK_APP=src.server:create_app flask run
