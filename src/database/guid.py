@@ -11,6 +11,7 @@ import uuid
 
 class GUID(TypeDecorator):
     """Uses CHAR(32), storing as stringified hex values."""
+
     impl = CHAR
 
     def load_dialect_impl(self, dialect):

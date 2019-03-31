@@ -1,84 +1,106 @@
 #!/usr/bin/env python3
-"""item route"""
+"""RESTful items route, contains routes for POST, PATCH, and DELETE."""
 
-from server import app  # will be from server
-from database._db import db # will be from server
-from database.models import Project, Item, Option # will be from server
+from flask import Blueprint, request
+from sqlalchemy.orm import scoped_session
+
+# from .decorators import background, email, limit
+from .utils import find_project_item_option
+from ..database import Item, Option
 from ..utils import hash_id
 
-
-# /api/projects/<project_id>/items
-
-# *GET* - get an item
-@app.route("/<item_id>")
-def get_catagory(item_id: str):
-    """
-    get next item, then find the following item
-    """
-    hashed_item_id = hash_id(project_id, item_id)
-    next_item = Item.query.get(hashed_item_id).next
-
-    # calculate next item using MAB + set next item to item.next
-    # ! can i calculate after sending response?
-
-    return next_item
+# TODO: handle POST case where item already exists (id)
+# TODO: MAB logic in item PATCH route
+# TODO: error handle --- item id invalid, etc.
+# TODO: implement decorators
 
 
-# *POST* - create new item
-@app.route("/<item_id>")
-def create_item(item_id: str):
-    """
-    create new id by hashing project_id and id provided, then create a new item
+def items_api_route(db_session: scoped_session) -> Blueprint:
+    """Wrapper for items Blueprint for passing db connection."""
 
-    if MAB cant add new items after starting, bulk create options at same time
+    # Blueprint for projects
+    items = Blueprint("items", __name__, url_prefix="/api/items")
 
-    USER MUST USE A UNIQUE IDENTIFIER (include this in the docs)
+    # ***********************
+    #  POST --- CREATE ITEM
+    # ***********************
+    @items.route("/", methods=["POST"])
+    # @limit(requests=100, window=(24 * 60 * 60 * 1000), by="ip")  # limit: 100 requests per day by ip
+    # @email
+    def create_item():
+        """POST - create an item given an `project_token` and `item_id`."""
 
+        # Extract token and id from request body
+        token = request.form.get("token")
+        item_id = request.form.get("item_id")
 
-    """
+        query_data = find_project_item_option(token=token)
+        if "error" in query_data:
+            return query_data["error"]
 
-    # ! how to grab project id from further down the route?
+        try:
+            # Create a new project from the query params
+            new_item = Item(project_id=query_data["project"].id, item_id=item_id)
+            db_session.add(new_item)
+            db_session.commit()
+        except:
+            db_session.rollback()
+            return "500 - internal server error."
 
-    project_title = Project.query(project_id).title
+        return f"<h1>id={new_item.id}, total_num={new_item.total_num}</h1>"  # not this
 
-    # sanitize item_id to protect against sql injection
+    # ***********************
+    #  PATCH --- UPDATE ITEM
+    # ***********************
+    @items.route("/", methods=["PATCH"])
+    # @background
+    def next_item() -> str:
+        """PATCH - retrieve the next option in line, and replace that with the following option."""
 
-    new_item = Item(project_id, item_id, project_title)
-    db.session.add(new_item)
-    db.session.commit()
+        # Extract token and id from request body
+        token = request.form.get("token")
+        item_id = request.form.get("item_id")
 
-    # * if MAB wont let me add more options after starting, do this:
-    # db.session.add_all(arr_of_options)
-    # db.session.commit()
+        query_data = find_project_item_option(token=token, item_id=item_id)
+        if "error" in query_data:
+            return query_data["error"]
 
-    return new_item
+        # next option in line --- value to be returned
+        next_option = query_data["item"].next
 
+        # replace item.next with MAB here...
 
-# *PATCH* - add update if item was clicked
-def update_item(item_id: str) -> None:
-    """
-    if image was clicked, factor that into MAB, update item.next if necessary
-    """
-    # ! update data for MAB, calculate `item.next`
-    # no return necessary
+        return next_option
 
+    # ************************
+    #  DELETE --- DELETE ITEM
+    # ************************
+    @items.route("/", methods=["DELETE"])
+    # @limit(requests=100, window=(24 * 60 * 60 * 1000), by="ip")  # limit: 100 requests per day by ip
+    def delete_item() -> str:
+        """DELETE - delete a project and all associated data given a `token`."""
 
-# *DELETE* - delete an item
-@app.route("/create/<item_id>")
-def delete_item(item_id: str):
-    """
-    Delete item with given id and all of the options associated with it
-    """
+        # Extract token and id from request body
+        token = request.form.get("token")
+        item_id = request.form.get("item_id")
 
-    # how to grab project id from further down the route?
-    hashed_item_id = hash_id(project_id, item_id)
-    item = Item.query(hashed_item_id)
+        query_data = find_project_item_option(token=token, item_id=item_id)
+        if "error" in query_data:
+            return query_data["error"]
 
-    for i in range(1, item.count + 1):
-        option = Option.query(hash_id(project_id, item_id, i))
-        db.session.delete(option)
+        # Iterate through all of the options related to the item and delete them
+        for i in range(1, query_data["item"].count + 1):
+            option = Option.query(hash_id(query_data["project"].id, item_id, i))
+            db_session.delete(option)
 
-    db.session.delete(item)
-    db.session.commit()
+        try:
+            db_session.delete(query_data["item"])
+            db_session.commit()
+        except:
+            db_session.rollback()
+            return "500 - internal server error."
 
-    return "deleted"  # what is returned?
+        return f"{item_id} and all related data was successfully deleted."
+
+    # Return items Blueprint
+    return items

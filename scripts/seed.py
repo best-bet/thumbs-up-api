@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Seed script"""
+"""Script for seeding the database with mock data."""
 
 import sys
 from typing import List, Tuple
@@ -11,7 +11,8 @@ from sqlalchemy.orm import scoped_session
 
 from src.database import connect_db, Project, Item, Option
 
-# TODO: kill process after seeding...
+# TODO: kill process after seeding.
+# TODO: pass `SEED_NUM` from terminal to `seed_db` as argument.
 
 
 def create_dev_server() -> Tuple[Flask, scoped_session]:
@@ -24,12 +25,12 @@ def create_dev_server() -> Tuple[Flask, scoped_session]:
     app.config.from_object(f"config.DevelopmentConfig")
 
     # route to handle killing the server
-    @app.route('/kill', methods=['POST'])
+    @app.route("/kill", methods=["POST"])
     def kill_app():
         """Stops the server, or throws an error if we are in the wrong environment."""
-        shutdown = request.environ.get('werkzeug.server.shutdown')
+        shutdown = request.environ.get("werkzeug.server.shutdown")
         if shutdown is None:
-            raise RuntimeError('Not running with the Werkzeug Server')
+            raise RuntimeError("Not running with the Werkzeug Server")
         shutdown()
         return "Shutting down..."
 
@@ -50,17 +51,29 @@ def generate_fake_data(size: int) -> List[Project and Item and Option]:
 
     # 100 (by default) fake projects
     for i in range(size):
-        new_project = Project(title=fake.iban(), email=fake.email(), phone=fake.phone_number())
+        new_project = Project(
+            title=fake.iban(), email=fake.email(), phone=fake.phone_number()
+        )
         fake_data.append(new_project)
 
         # 1-18 fake items per project
         for j in range((i % 10 * 2) or 1):
-            new_item = Item(project_id=new_project.id, item_id=fake.uuid4(), project_title=new_project.title)
+            new_item = Item(
+                project_id=new_project.id,
+                item_id=fake.uuid4()
+            )
             fake_data.append(new_item)
 
             # 0-9 fake options per item
             for k in range(1, 10 % (j or 1)):
-                fake_data.append(Option(project_id=new_project.id, item_id=new_item.id, option_num=k, content=fake.image_url()))
+                fake_data.append(
+                    Option(
+                        project_id=new_project.id,
+                        item_id=new_item.id,
+                        option_num=k,
+                        content=fake.image_url(),
+                    )
+                )
                 new_item.total_num += 1
 
     print("Finished generating mock data...")
@@ -75,20 +88,25 @@ def seed_db(seed_num: int = 100) -> Flask:
     app, db_session = create_dev_server()
 
     # Generates fake data for Projects, Items and Options
-    fake_data = generate_fake_data(seed_num)  # <------- server is reloading, this runs twice
+    fake_data = generate_fake_data(seed_num)
 
     # Commit changes to the database
     try:
         print("Adding mock data to database...")
         db_session.add_all(fake_data)
+
         print("Committing changes to database...")
         db_session.commit()
+
         print("Changes Committed to database!")
         print("Finished seeding!")
+
     except SQLAlchemyError as err:
         print("There was a SQLAlchemy error during seeding.", err, file=sys.stderr)
+
     except:
         print("Uncaught error:", sys.exc_info()[0], file=sys.stderr)
+
     finally:
         db_session.close()
         print("Kill server, seeding is complete.")
