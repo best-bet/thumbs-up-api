@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """RESTful projects route, contains routes for GET, POST, PATCH, and DELETE."""
 
+import sys
+
 from envelopes import Envelope
 from flask import Blueprint, render_template, request
-from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import scoped_session, exc
 
 # from .decorators import background, email, limit
 from .utils import find_project_item_option
 from ..database import Project, Item, Option
 from ..utils import hash_id, Validate
 
+# TODO: handle NoResultFound
 # TODO: handle POST case where project already exists (title)
 # TODO: implement email on project creation
 # TODO: email verification to edit project
@@ -62,11 +65,13 @@ def projects_api_route(db_session: scoped_session) -> Blueprint:
         phone = request.form.get("phone")
 
         if not Validate.title(title):
+            if len(title) < 4 or len(title) > 30:  # there might be an error here?
+                return "Your project's title must be as little as 4 and at most 30 characters."
             return 'Please provide valid title: alphanumeric characters, "-", "_", and "." are valid.'
         if not Validate.email(email):
-            return "Please provide valid email."
+            return "Please provide valid email address."
         if not Validate.phone(phone):
-            return "Please provide valid phone."
+            return "Please provide valid phone number."
 
         try:
             # Create a new project from the query params
@@ -142,17 +147,22 @@ def projects_api_route(db_session: scoped_session) -> Blueprint:
             return query_data["error"]
 
         # Retrieve all items associated with the project
-        project_items = Item.query.filter_by(project_id=query_data["project"].id)
-
-        print("\n\n\n\nproject_items", project_items, "\n\n\n\n")
+        # project_items = Item.query.filter_by(project_id=query_data["project"].id)
+        try:
+            project_items = Item.query.filter(Item.id.like(f"{query_data['project'].id}%")).all()
+        except:
+            return "500 - internal server error."
 
         # Iterate through all of the items and options related to the project and delete them
         for item in project_items:
-            for i in range(1, item.count + 1):
-                option = Option.query(hash_id(query_data["project"].id, item.id, i))
-                db_session.delete(option)
+            for i in range(1, item.total_num + 1):
+                try:
+                    Option.query.filter_by(id=hash_id(query_data["project"].id, item.id, i)).delete()
+                except exc.UnmappedInstanceError as err:
+                    print('\n\n\n\n', err, '\n\n\n\n')
+                    return "500 - internal server error."
 
-            db_session.delete(item)
+            db_session.delete(item)  # try / except here?
 
         try:
             db_session.delete(query_data["project"])

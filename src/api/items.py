@@ -21,9 +21,9 @@ def items_api_route(db_session: scoped_session) -> Blueprint:
     # Blueprint for projects
     items = Blueprint("items", __name__, url_prefix="/api/items")
 
-    # ***********************
+    # **********************
     #  POST --- CREATE ITEM
-    # ***********************
+    # **********************
     @items.route("/", methods=["POST"])
     # @limit(requests=100, window=(24 * 60 * 60 * 1000), by="ip")  # limit: 100 requests per day by ip
     # @email
@@ -89,8 +89,8 @@ def items_api_route(db_session: scoped_session) -> Blueprint:
             return query_data["error"]
 
         # Iterate through all of the options related to the item and delete them
-        for i in range(1, query_data["item"].count + 1):
-            option = Option.query(hash_id(query_data["project"].id, item_id, i))
+        for i in range(1, query_data["item"].total_num + 1):
+            option = Option.query.get(hash_id(query_data["project"].id, item_id, i))
             db_session.delete(option)
 
         try:
@@ -100,7 +100,7 @@ def items_api_route(db_session: scoped_session) -> Blueprint:
             db_session.rollback()
             return "500 - internal server error."
 
-        return f"{item_id} and all related data was successfully deleted."
+        return f"Item with id of {item_id} and all related data was successfully deleted."
 
     # Return items Blueprint
     return items

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Utility functions, includes: `hash_id` and Validate class"""
+"""Utility functions, includes: `hash_id` and `Validate` class."""
 
 import re
 
@@ -31,7 +31,7 @@ class Validate:
     @staticmethod
     def title(x: str) -> bool:
         """Use regular expressions to check if input string is a valid project title."""
-        regex = r"^(?![-._])(?!.*[_.-]{2})[\w.-]{6,30}(?<![-._])$"
+        regex = r"^(?![-._])(?!.*[_.-]{2})[\w.-]{4,30}(?<![-._])$"
         try:
             return re.match(regex, x) is not None
         except:

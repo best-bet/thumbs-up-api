@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Utility functions for `api/`, includes: find_project_item_option"""
+"""Utility functions, includes: `find_project_item_option`."""
 
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -23,7 +23,7 @@ def find_project_item_option(**kwargs: str or int) -> dict:
     # Dictionary containing response data and possibly an error message
     data = {}
 
-    # If token is provided, find project by token and handle errors, else return .....
+    # If token is provided, find project by token and handle errors, else return "server error"
     if "token" in kwargs:
         try:
             data["project"] = Project.query.filter_by(token=kwargs["token"]).one()
@@ -36,7 +36,7 @@ def find_project_item_option(**kwargs: str or int) -> dict:
         data["error"] = "500 - internal server error: invalid input."
         return data
 
-    # If item_id is provided, find item and handle errors, else return project
+    # If item_id is provided, find item and handle errors, else return `data`
     if "item_id" in kwargs:
         try:
             data["item"] = Item.query.get(hash_id(data["project"].id, kwargs["item_id"]))
@@ -48,7 +48,7 @@ def find_project_item_option(**kwargs: str or int) -> dict:
     else:
         return data
 
-    # If option_num is provided, find option and handle errors, else return (project, item)
+    # If option_num is provided, find option and handle errors, else return `data`
     if "option_num" in kwargs:
         try:
             data["option"] = Option.query.get(hash_id(data["project"].id, kwargs["item_id"], kwargs["option_num"]))
