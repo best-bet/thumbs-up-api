@@ -1,109 +1,177 @@
 #!/usr/bin/env python3
-"""project route"""
+"""RESTful projects route, contains routes for GET, POST, PATCH, and DELETE."""
 
-from src import app  # this will be passed by server
+import sys
 
-from database import db, Project, Item, Option  # this will be from app
-from ..utils import hash_id
+from envelopes import Envelope
+from flask import Blueprint, render_template, request
+from sqlalchemy.orm import scoped_session, exc
 
-# /api/projects
+# from .decorators import background, email, limit
+from .utils import find_project_item_option
+from ..database import Project, Item, Option
+from ..utils import hash_id, Validate
 
-
-# *GET* - get a project
-@app.route("/<id>", methods=["GET"])
-def get_project(id: str):  # uuid4()?
-    """
-    user can request any info on the project except `sms` and `verification_code`
-    can search by:
-        *id -------- might not need this (user has token, not id)
-        *title
-        *token
-    """
-
-    # ? user has to specify what they want back? `return_val=email` - grab email field
-
-    return Project.query.get(id).title  # not sure what to return
+# TODO: handle NoResultFound
+# TODO: handle POST case where project already exists (title)
+# TODO: implement email on project creation
+# TODO: email verification to edit project
+# TODO: require email verification to delete project
+# TODO: error handle --- token invalid, etc.
+# TODO: implement decorators
 
 
-# *POST* - create new project
-@app.route("/<new_project_data>", methods=["POST"])  # how to say post req?
-def create_project(new_project_data: str) -> int:
-    """
-    create a new project with `title`, `email`, `phone`
-    `sms, and `verification_code` are also fields here
+def projects_api_route(db_session: scoped_session) -> Blueprint:
+    """Wrapper for projects Blueprint, passes db connection to routes."""
 
-    `new_project_data` should look like this: title=my-title&email=my.email@email.com&phone=1234567890
+    # Blueprint for projects
+    projects = Blueprint(
+        "projects",
+        __name__,
+        template_folder="src.templates",
+        url_prefix="/api/projects",
+    )
 
-    send email with new project id
+    # *****************************
+    #  GET --- GET PROJECT (title)
+    # *****************************
+    @projects.route("/", methods=["GET"])
+    # @limit(requests=100, window=(24 * 60 * 60 * 1000), by="ip")  # limit: 100 requests per day by ip
+    def get_project_title():
+        """GET - get the title of the project given a project token."""
 
-    if email is not sent, sent to wrong place, HOW TO DELETE?
-    """
+        # Extract token from query string
+        token = request.args.get("token")
 
-    title, email, phone = new_project_data  # format this
+        # Retrieve project with token
+        query_data = find_project_item_option(token=token)
+        if "error" in query_data:
+            return query_data["error"]
 
-    new_project = Project(title, email, phone)
-    db.session.add(new_project)
-    db.session.commit()
+        return query_data["project"].title
 
-    # email???
+    # *************************
+    #  POST --- CREATE PROJECT
+    # *************************
+    @projects.route("/", methods=["POST"])
+    # @limit(requests=100, window=(24 * 60 * 60 * 1000), by="ip")  # limit: 100 requests per day by ip
+    # @email
+    def create_project():
+        """POST - create a project given a `title`, `email` and `phone`."""
 
-    return new_project  # not sure what to returns
+        # Extract request body
+        title = request.form.get("title")
+        email = request.form.get("email")
+        phone = request.form.get("phone")
 
+        if not Validate.title(title):
+            if len(title) < 4 or len(title) > 30:  # there might be an error here?
+                return "Your project's title must be as little as 4 and at most 30 characters."
+            return 'Please provide valid title: alphanumeric characters, "-", "_", and "." are valid.'
+        if not Validate.email(email):
+            return "Please provide valid email address."
+        if not Validate.phone(phone):
+            return "Please provide valid phone number."
 
-# *PATCH* - edit project
-@app.route("/<token>/<new_data>", methods=["PATCH"])
-def edit_project(token: str):
-    """
-    which fields are editable / verification necessary?
+        try:
+            # Create a new project from the query params
+            new_project = Project(title=title, email=email, phone=phone)
+            db_session.add(new_project)
+            db_session.commit()
+        except:
+            db_session.rollback()
+            return "500 - internal server error."
 
-    title=my-new-title
-    email=mynewemail@email.com
-    phone=9999999999
-    token --- new uuid
-    sms=123456
-    verification=123456
-    """
+        # # when creating a new project, send confirmation email...
+        # envelope = Envelope(
+        #     to_addr=email,
+        #     from_addr=(u'from@example.com', u'the team at thumbs up'),
+        #     subject="Thank you for creating a new project with thumbs up!",
+        #     text_body="this works?",  # render_template('src/templates/email.txt'),
+        #     html_body=render_template('src/templates/email.html')
+        # )
+        #
+        # # Send the envelope using an ad-hoc connection...
+        # envelope.send('smtp.googlemail.com', login='kyleuehlein@gmail.com', password='notpassword', tls=True)
 
-    project = Project.query.filter_by(token=token)
+        return f"<h1>title={title}, email={email}, phone={phone}, token={new_project.token}</h1>"  # not this
 
-    # only change one thing at a time
-    # if change email, send sms to phone and verification to new email
-    # if change phone, send sms to new phone and verification to email
-    # if change title or token, send sms to phone and verification to email
+    # **************************
+    #  PATCH --- UPDATE PROJECT
+    # **************************
+    @projects.route("/", methods=["PATCH"])
+    # @limit(requests=100, window=(24 * 60 * 60 * 1000), by="ip")  # limit: 100 requests per day by ip
+    # @email
+    def update_project():
+        """PATCH - edit a project given the respective fields; `title`, `email`, `phone` or `token`."""
 
-    # if user submits sms and verification that match what is in db
-    # set both to null and update with provided email
+        # Extract request body
+        title = request.form.get("title")
+        email = request.form.get("email")
+        phone = request.form.get("phone")
+        token = request.form.get("token")
 
-    # ! where to store new value that is being changed before verification?
-    # * mush it into the sms + verification code field?
-    # * should i even have sms and verification fields? --- this is a lot of space
-    # * for an operation that hardly ever happens
+        # Retrieve project with token
+        query_data = find_project_item_option(token=token)
+        if "error" in query_data:
+            return query_data["error"]
 
-    return "changed"  # not sure what to return
+        # only change one thing at a time
+        # if change email, send sms to phone and verification to new email
+        # if change phone, send sms to new phone and verification to email
+        # if change title or token, send sms to phone and verification to email
 
+        # if user submits sms and verification that match what is in db
+        # set both to null and update with provided email
 
-# *DELETE* - delete project
-@app.route("/<token>", methods=["DELETE"])
-def delete_project(token: str):
-    """
-    delete project, all associated item and all of their associated options
+        # ! where to store new value that is being changed before verification?
+        # * mush it into the sms + verification code field?
+        # * should i even have sms and verification fields? --- this is a lot of space
+        # * for an operation that hardly ever happens
 
-    should there be an email verification?
+    # ***************************
+    #  DELETE --- DELETE PROJECT
+    # ***************************
+    @projects.route("/", methods=["DELETE"])
+    # @limit(requests=100, window=(24 * 60 * 60 * 1000), by="ip")  # limit: 100 requests per day by ip
+    # @email
+    def delete_project() -> str:
+        """DELETE - delete a project and all associated data given a `token`."""
 
-    how will items with the id be found?
-        - ids like this one? (match project_id at front of item_id)
-        - then delete options assoc.
-    """
-    project = Project.query.filter_by(token=token)
-    project_items = Item.query.filter_by(title=project.title)
+        # Extract token from query string
+        token = request.form.get("token")
 
-    for item in project_items:
-        for i in range(1, item.count + 1):
-            option = Option.query(hash_id(project_id, item_id, i))
-            db.session.delete(option)
-        db.session.delete(item)
+        # Retrieve project with token
+        query_data = find_project_item_option(token=token)
+        if "error" in query_data:
+            return query_data["error"]
 
-    db.session.delete(project)
-    db.session.commit()
+        # Retrieve all items associated with the project
+        # project_items = Item.query.filter_by(project_id=query_data["project"].id)
+        try:
+            project_items = Item.query.filter(Item.id.like(f"{query_data['project'].id}%")).all()
+        except:
+            return "500 - internal server error."
 
-    return "project deleted"  # not sure what to return
+        # Iterate through all of the items and options related to the project and delete them
+        for item in project_items:
+            for i in range(1, item.total_num + 1):
+                try:
+                    Option.query.filter_by(id=hash_id(query_data["project"].id, item.id, i)).delete()
+                except exc.UnmappedInstanceError as err:
+                    print('\n\n\n\n', err, '\n\n\n\n')
+                    return "500 - internal server error."
+
+            db_session.delete(item)  # try / except here?
+
+        try:
+            db_session.delete(query_data["project"])
+            db_session.commit()
+        except:
+            db_session.rollback()
+            return "500 - internal server error."
+
+        return f"{query_data['project'].title} and all related data was successfully deleted."
+
+    # Return projects Blueprint
+    return projects

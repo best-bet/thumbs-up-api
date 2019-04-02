@@ -21,14 +21,16 @@ def connect_db(app: Flask) -> scoped_session:
     engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"], convert_unicode=True)
 
     # Bind session to db connection --- this is connection used by API
-    db_session = scoped_session(sessionmaker(bind=engine, autocommit=False, autoflush=False))
+    db_session = scoped_session(
+        sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    )
 
     # Create Base query and Base metadata
     Base.query = db_session.query_property()
     Base.metadata.create_all(bind=engine)
 
     # Migrate changes in schema into database
-    Migrate(app, engine)
+    Migrate(app, engine)  # <---- currently doesnt work
 
     # Register models
     from .models import Project, Item, Option

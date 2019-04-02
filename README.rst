@@ -12,7 +12,7 @@ Public API for the  optimization of traffic using ML
 :Source: https://github.com/best-bet/thumbs-up-api
 :Keywords: thumbnail, a/b_testing, multi_armed_bandit, python, api
 
---
+----
 
 .. _What is thumbs up?:
 
@@ -61,7 +61,7 @@ the content's thumbnails.
 
 thumbs up utilizes machine learning to help you find the most clickable
 thumbnail out of a set that you provide based on real world interactions
-with your users. This can significanly increase traffic to your products!
+with your users. This can significantly increase traffic to your products!
 
 .. _What-is-the-Multi-Armed-Bandit-Algorithm?:
 
@@ -139,6 +139,16 @@ documentation.
 
 .. _`Contributing to thumbs up`:
     https://github.com/best-bet/thumbs-up-api/blob/master/CONTRIBUTING.rst
+
+.. _tracking-development:
+
+Tracking Development
+====================
+
+If you are interested in tracking development, check out our `scrum board`_!
+
+.. _`scrum board`:
+    https://app.asana.com/0/1116794279727503/1116794279727503
 
 .. _license:
 
