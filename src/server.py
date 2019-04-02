@@ -13,8 +13,6 @@ from flask_cors import CORS
 from .api import projects, items, options
 from .database import connect_db
 
-# TODO: Connect to api
-
 
 def create_app():
     """Create an instance of the Flask server"""

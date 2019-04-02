@@ -4,15 +4,10 @@
 from uuid import uuid4
 
 from sqlalchemy import Column, Integer, Text
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from ._db import Base
 from .guid import GUID
 from ..utils import hash_id
-
-# TODO: default value for item when no option, ensure this if options deleted
-
-# can you associate based on virtual fields? s--- would i need to?
 
 
 class Project(Base):
@@ -33,14 +28,7 @@ class Project(Base):
         self.verification = None  # store email code, sms + new field here
 
     def __repr__(self):
-        return {
-            "id": self.id,
-            "token": self.token,
-            "title": self.title,
-            "email": self.email,
-            "phone": self.phone,
-            "verification": self.verification,
-        }
+        return f"id: {self.id}, token: {self.token}, title: {self.title}, email: {self.email}, phone: {self.phone}"
 
     def __str__(self):
         return "Project Model"
@@ -57,23 +45,14 @@ class Item(Base):
         nullable=False,
     )
 
-    @hybrid_property
-    def project_id(self) -> str:
-        """'Un-hash' item's id to access the project's id, and return the project's id."""
-        return self.id.split(":")[0]
-
     def __init__(self, project_id: str, item_id: str or int):
         self.id = hash_id(project_id, item_id)
         self.total_num = 0
+        # self.next = ???
         # any other data needed for MAB might go here
 
     def __repr__(self):
-        return {
-            "id": self.id,
-            "project_title": self.project_title,
-            "total_num": self.total_num,
-            "next": self.next,
-        }
+        return f"id: {self.id}, total_num: {self.total_num}, next: {self.next}"
 
     def __str__(self):
         return "Item Model"
@@ -85,22 +64,12 @@ class Option(Base):
     id = Column(Text, primary_key=True)
     content = Column(Text, nullable=False)
 
-    @hybrid_property
-    def project_id(self) -> str:
-        """'Un-hash' option's id to access the project's id, and return the project's id."""
-        return self.id.split(":")[0]  # project is first part of id hash
-
-    @hybrid_property
-    def item_id(self) -> str:
-        """'Un-hash' option's id to access the item's id, and return the items's id."""
-        return self.id.split(":")[1]  # item is second part of id hash
-
     def __init__(self, project_id: str, item_id: str, option_num: int, content: str):
         self.id = hash_id(project_id, item_id, option_num)
         self.content = content
 
     def __repr__(self):
-        return {"id": self.id, "content": self.content}
+        return f"id: {self.id}, content: {self.content}"
 
     def __str__(self):
         return "Option Model"
