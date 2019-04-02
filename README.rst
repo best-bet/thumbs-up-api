@@ -148,7 +148,7 @@ Tracking Development
 If you are interested in tracking development, check out our `scrum board`_!
 
 .. _`scrum board`:
-    https://app.asana.com/0/1116794279727503/board
+    https://app.asana.com/0/1116794279727503/1116794279727503
 
 .. _license:
 
