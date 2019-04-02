@@ -29,13 +29,13 @@ seed:
 		FLASK_APP=scripts.seed:seed_db flask run --no-reload
 
 run:
-		FLASK_ENV=development FLASK_APP=src.server:create_app flask run
+		FLASK_ENV=development FLASK_APP=src:create_app flask run
 
 run-prod:
-		FLASK_ENV=production FLASK_APP=src.server:create_app flask run
+		FLASK_ENV=production FLASK_APP=src:create_app flask run
 
 run-test:
-		FLASK_ENV=test FLASK_APP=tests__main__:run_suite flask run
+		FLASK_ENV=test FLASK_APP=tests.__main__:run_suite flask run
 
 freeze:
 		pip freeze > requirements.txt

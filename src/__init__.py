@@ -1,11 +1,7 @@
-# # this file designates `api/` as a package
+#!/usr/bin/env python3
+"""thumbs-up-api package root"""
 
-import os
-import sys
+from .server import create_app
 
-sys.path.insert(1, os.path.realpath(os.path.pardir))
 
-# from server import app
-# import src.server
-
-# __all__ = ["server"]
+__all__ = ["create_app"]
