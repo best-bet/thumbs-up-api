@@ -140,6 +140,16 @@ documentation.
 .. _`Contributing to thumbs up`:
     https://github.com/best-bet/thumbs-up-api/blob/master/CONTRIBUTING.rst
 
+.. _tracking-development:
+
+Tracking Development
+====================
+
+If you are interested in tracking development, check out our `scrum board`_!
+
+.. _`scrum board`:
+    https://app.asana.com/0/1116794279727503/board
+
 .. _license:
 
 License
