@@ -40,16 +40,8 @@ class Item(Base):
     total_num = Column(Integer, nullable=False)
     active_trial = Column(Boolean, default=False, nullable=False)
     mab = Column(PickleType)
-    next = Column(
-        Text,
-        default="https://user-images.githubusercontent.com/1825286/26859182-9d8c266c-4afb-11e7-8913-93d29b3f47e5.png",
-        nullable=False,
-    )
-    best = Column(
-        Text,
-        default="https://user-images.githubusercontent.com/1825286/26859182-9d8c266c-4afb-11e7-8913-93d29b3f47e5.png",
-        nullable=False,
-    )
+    next = Column(Text)
+    option_num = Column(Integer)
 
     def __init__(self, project_id: str, item_id: str or int):
         self.id = hash_id(project_id, item_id)

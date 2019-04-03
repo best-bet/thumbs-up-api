@@ -12,7 +12,6 @@ from .utils import find_project_item_option
 from ..database import Project, Item, Option
 from ..utils import hash_id, Validate
 
-# TODO: handle NoResultFound
 # TODO: handle POST case where project already exists (title)
 # TODO: implement email on project creation
 # TODO: email verification to edit project
