@@ -108,6 +108,7 @@ UBC-1, etc.), but we have have chosen to use the **Bayesian Theorem**
 The Bayesian Theorem will help us answer that question; it states the following:
 
 ::
+
 For two events **Y** and **Z**, the conditional probability of **Y** given **Z**
 is the conditional probability of **Z** given **Y** scaled by the relative
 probability of **Y** compared to **Z**: PZ=PY*P(Y)P(Z)
@@ -121,7 +122,7 @@ get the results of the experiment in as little time as possible, with less data,
 **AND** the same level of statistical validity as regular A/B testing.
 
 If that isn't convincing enough, take Google's word for it. Google uses the Bayesian
-multi-armed bandit for .. `Google Analytics`_!
+multi-armed bandit for `Google Analytics`_!
 
 For a detailed analysis of the Bayesian multi-armed bandit algoritm:
 `A modern Bayesian look at the multi-armed bandit`_
