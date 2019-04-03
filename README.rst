@@ -107,9 +107,8 @@ UBC-1, etc.), but we have have chosen to use the **Bayesian Theorem**
 
 The Bayesian Theorem will help us answer that question; it states the following::
 
-    For two events Y and Z, the conditional probability of Y given Z is the conditional
-    probability of Z given Y scaled by the relative probability of Y compared
-    to Z: PZ=PY*P(Y)P(Z)
+    For two events Y and Z, the conditional probability of Y given Z is the conditional probability of Z
+    given Y scaled by the relative probability of Y compared to Z: PZ=PY*P(Y)P(Z)
 
 This means that for every iteration of our trial, we scale the distribution of
 thumbnails based on the set of previous distributions of clicks.
