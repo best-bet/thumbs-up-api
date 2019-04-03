@@ -102,8 +102,8 @@ So now that we know what a multi-armed bandit solution is, which implementation
 is used by thumbs up?
 
 There are many variations on the multi-armed bandit (Epsilon-Greedy, Softmax,
-UBC-1, etc.), but we have have chosen to use the **Bayesian Theorem**
-(AKA Thompson Sampling or Randomized Probability Matching). *Why?*
+UBC-1, etc.), but we have chosen to use the **Bayesian Theorem** (AKA Thompson
+Sampling or Randomized Probability Matching). *Why?*
 
 The Bayesian Theorem will help us answer that question; it states the following::
 
