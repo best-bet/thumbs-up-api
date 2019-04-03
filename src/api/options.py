@@ -9,8 +9,6 @@ from .utils import find_project_item_option
 from ..database import Option
 from ..utils import hash_id, Validate
 
-# TODO: if option is deleted, check if that option is item.next, and if so, find new item.next
-# TODO: if option is deleted, and it is the only option, swap out item.next with default content
 # TODO: error handle --- option invalid, etc.
 # TODO: implement decorators
 # TODO: check for duplicate urls associated with the same item upon creation
@@ -43,12 +41,12 @@ def options_api_route(db_session: scoped_session) -> Blueprint:
         if "error" in query_data:
             return query_data["error"]
 
+        # If MAB trial has already started, we can't add new options
+        if query_data["item"].mab:
+            return "Trial has already begun, you cannot add or delete options at this time.  Delete item to start again."
+
         # Update number of options for item
         query_data["item"].total_num += 1
-
-        # If this is the first option, swap out default value for item.next with new option's content
-        if query_data["item"].total_num == 1:
-            query_data["item"].next = content
 
         try:
             # Create a new option from the query params, update item.total_num
@@ -87,6 +85,10 @@ def options_api_route(db_session: scoped_session) -> Blueprint:
         query_data = find_project_item_option(token=token, item_id=item_id)
         if "error" in query_data:
             return query_data["error"]
+
+        # If MAB trial has already started, we can't add new options
+        if query_data["item"].mab:
+            return "Trial has already begun, you cannot add or delete options at this time. Delete item to start again."
 
         # Check each option for a match with option content
         for i in range(1, query_data["item"].total_num + 1):
