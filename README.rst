@@ -83,17 +83,52 @@ beginning of the experiment, when odds and payouts are unknown, the gambler
 must determine which machine to pull, in which order and how many times.
 This is the “multi-armed bandit problem.”
 
-More at:
+More at: `Optimizely`_
 
-`Optimizely`_
+Also: `Wikipedia`_
 
-Also:
+.. _`Optimizely`:
+    https://www.optimizely.com/optimization-glossary/multi-armed-bandit/
 
-`Wikipedia`_
+.. _`Wikipedia`:
+    https://en.wikipedia.org/wiki/Multi-armed_bandit
 
-.. _`Optimizely`: https://www.optimizely.com/optimization-glossary/multi-armed-bandit/
+.. _`The Bayesian Multi-Armed Bandit`:
 
-.. _`Wikipedia`: https://en.wikipedia.org/wiki/Multi-armed_bandit
+The Bayesian Multi-Armed Bandit
+===============================
+
+So now that we know what a multi-armed bandit solution is, which implementation
+is used by thumbs up?
+
+There are many variations on the multi-armed bandit (Epsilon-Greedy, Softmax,
+UBC-1, etc.), but we have chosen to use the **Bayesian Theorem** (AKA Thompson
+Sampling or Randomized Probability Matching). *Why?*
+
+The Bayesian Theorem will help us answer that question; it states the following::
+
+    For two events Y and Z, the conditional probability of Y given Z is the conditional probability of Z
+    given Y scaled by the relative probability of Y compared to Z.
+
+This means that for every iteration of our trial, we scale the distribution of
+thumbnails based on the set of previous distributions of clicks.
+
+Basically, after every trial we recompute the probabilities of each thumbnail's
+superiority, scaled by the number of trials in total. This approach will help us
+get the results of the experiment in as little time as possible, with less data,
+**AND** the same level of statistical validity as regular A/B testing.
+
+If that isn't convincing enough, take Google's word for it. Google uses the Bayesian
+multi-armed bandit for `Google Analytics`_!
+
+For a detailed analysis of the Bayesian multi-armed bandit algoritm:
+`A modern Bayesian look at the multi-armed bandit`_
+
+.. _`Google Analytics`:
+    https://support.google.com/analytics/answer/2844870?hl=en&ref_topic=1745207
+
+.. _`A modern Bayesian look at the multi-armed bandit`:
+    http://www.economics.uci.edu/~ivan/asmb.874.pdf
 
 .. _getting-started:
 
@@ -104,7 +139,7 @@ If you are new here, these are some resources that may be helpful:
 
 - `Getting started with thumbs up`_
 
-    A quick introduction to a simple setup with thumbs up.
+    A quick introduction to a *simple* setup with thumbs up.
 
 - `API reference`_
 

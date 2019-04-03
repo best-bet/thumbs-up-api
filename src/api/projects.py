@@ -12,7 +12,6 @@ from .utils import find_project_item_option
 from ..database import Project, Item, Option
 from ..utils import hash_id, Validate
 
-# TODO: handle NoResultFound
 # TODO: handle POST case where project already exists (title)
 # TODO: implement email on project creation
 # TODO: email verification to edit project
@@ -43,7 +42,7 @@ def projects_api_route(db_session: scoped_session) -> Blueprint:
         # Extract token from query string
         token = request.args.get("token")
 
-        # Retrieve project with token
+        # Find project by token
         query_data = find_project_item_option(token=token)
         if "error" in query_data:
             return query_data["error"]
@@ -162,7 +161,7 @@ def projects_api_route(db_session: scoped_session) -> Blueprint:
                     print('\n\n\n\n', err, '\n\n\n\n')
                     return "500 - internal server error."
 
-            db_session.delete(item)  # try / except here?
+            db_session.delete(item)
 
         try:
             db_session.delete(query_data["project"])
