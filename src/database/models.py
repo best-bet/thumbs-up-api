@@ -3,7 +3,7 @@
 
 from uuid import uuid4
 
-from sqlalchemy import Column, Integer, Text
+from sqlalchemy import Boolean, Column, Integer, PickleType, Text
 
 from ._db import Base
 from .guid import GUID
@@ -25,7 +25,6 @@ class Project(Base):
         self.title = title
         self.email = email
         self.phone = phone
-        self.verification = None  # store email code, sms + new field here
 
     def __repr__(self):
         return f"id: {self.id}, token: {self.token}, title: {self.title}, email: {self.email}, phone: {self.phone}"
@@ -39,7 +38,14 @@ class Item(Base):
 
     id = Column(Text, primary_key=True)
     total_num = Column(Integer, nullable=False)
+    active_trial = Column(Boolean, default=False, nullable=False)
+    mab = Column(PickleType)
     next = Column(
+        Text,
+        default="https://user-images.githubusercontent.com/1825286/26859182-9d8c266c-4afb-11e7-8913-93d29b3f47e5.png",
+        nullable=False,
+    )
+    best = Column(
         Text,
         default="https://user-images.githubusercontent.com/1825286/26859182-9d8c266c-4afb-11e7-8913-93d29b3f47e5.png",
         nullable=False,
@@ -48,8 +54,6 @@ class Item(Base):
     def __init__(self, project_id: str, item_id: str or int):
         self.id = hash_id(project_id, item_id)
         self.total_num = 0
-        # self.next = ???
-        # any other data needed for MAB might go here
 
     def __repr__(self):
         return f"id: {self.id}, total_num: {self.total_num}, next: {self.next}"
