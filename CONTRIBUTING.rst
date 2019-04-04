@@ -1,9 +1,3 @@
-guidelines for contributing:
-
-before submitting a pr:
-  * run `make test`
-  * run `make format`
-
 ==============
  Contributing
 ==============
@@ -183,6 +177,12 @@ Creating pull requests is easy, and also let you track the progress
 of your contribution. Read the `Pull Requests`_ section in the GitHub
 Guide to learn how this is done.
 
+Before submitting a pull request, please format your code using this command::
+
+    $ make format
+
+This helps keep our repository ✨sparkly clean✨
+
 .. _`Pull Requests`: http://help.github.com/send-pull-requests/
 
 .. _contributing-coverage:
@@ -223,37 +223,6 @@ Code coverage in XML (Cobertura-style)
     $ py.test --cov=thumbs-up-api --cov-report=xml
 
 #. The coverage XML output will then be located in the ``coverage.xml`` file.
-
-.. _contributing-verify:
-
-Verifying your contribution
----------------------------
-
-To use these tools you need to install a few dependencies. These dependencies
-can be found in ``requirements/pkgutils.txt``.
-
-Installing the dependencies:
-
-::
-
-    $ pip install -U -r requirements/pkgutils.txt
-
-pyflakes & PEP-8
-~~~~~~~~~~~~~~~~
-
-To ensure that your changes conform to ``8`` and to run pyflakes
-execute:
-
-::
-
-    $ make flakecheck
-
-To not return a negative exit code when this command fails use
-the ``flakes`` target instead:
-
-::
-
-    $ make flakes§
 
 .. _coding-style:
 
@@ -339,77 +308,16 @@ Contacts
 ========
 
 This is a list of people that can be contacted for questions
-regarding the official git repositories, PyPI packages
-Read the Docs pages.
-
-If the issue isn't an emergency then it's better
-to `report an issue`_.
-
-
-Committers
-----------
-
-You!
-~~~~
-
-:github: https://github.com/you
-:website: http://you.com
+regarding thumbs up.
 
 Maintainers
 -----------
 
-thumbs up is run and maintained by
+thumbs up is run and maintained by:
 
 Kyle Uehlein
 ~~~~~~~~~~~
 
 :github: https://github.com/kuehlein
-:twitter: http://kyleuehlein.com
-
-.. _release-procedure:
-
-
-Release Procedure
-=================
-
-Updating the version number
----------------------------
-
-The version number must be updated two places:
-
-    * ``thumbs-up-api/__init__.py``
-    * ``docs/include/introduction.txt``
-
-After you have changed these files you must render
-the ``README`` files. There's a script to convert sphinx syntax
-to generic reStructured Text syntax, and the make target `readme`
-does this for you:
-
-::
-
-    $ make readme
-
-Now commit the changes:
-
-::
-
-    $ git commit -a -m "Bumps version to X.Y.Z"
-
-and make a new version tag:
-
-::
-
-    $ git tag vX.Y.Z
-    $ git push --tags
-
-Releasing
----------
-
-Commands to make a new public stable release:
-
-::
-
-    $ make distcheck  # checks pep8, autodoc index, runs tests and more
-    $ make dist  # NOTE: Runs git clean -xdf and removes files not in the repo.
-    $ python setup.py sdist upload --sign --identity='Celery Security Team'
-    $ python setup.py bdist_wheel upload --sign --identity='Celery Security Team'
+:email: kyleuehlein@gmail.com
+:website: http://kyleuehlein.com
