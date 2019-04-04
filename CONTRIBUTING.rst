@@ -11,6 +11,9 @@ you should try to mimic the conventions you see surrounding the code
 you're working on, but in the end all patches will be cleaned up by
 the person merging the changes so don't worry too much.
 
+.. contents::
+    :local:
+
 .. _community-code-of-conduct:
 
 When you're unsure, ask for help
@@ -69,7 +72,7 @@ developer trying to fix the bug might ask.
 Working on Features & Patches
 =============================
 
-::
+.. note::
 
     Contributing to thumbs up should be as simple as possible,
     so none of these steps should be considered mandatory.
@@ -314,3 +317,7 @@ thumbs up is run and maintained by:
 
 Kyle Uehlein
 ~~~~~~~~~~~
+
+:github: https://github.com/kuehlein
+:email: kyleuehlein@gmail.com
+:website: http://kyleuehlein.com
