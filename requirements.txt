@@ -38,6 +38,7 @@ pyOpenSSL==19.0.0
 PySocks==1.6.8
 pytest==4.4.0
 pytest-cov==2.6.1
+pytest-flask==0.14.0
 python-dateutil==2.8.0
 python-editor==1.0.4
 PyYAML==5.1
