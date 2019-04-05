@@ -18,7 +18,7 @@ def connect_db(app: Flask) -> scoped_session:
     """Create a connection to the database, migrate changes and register the models."""
 
     # Connect to database
-    engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"], convert_unicode=True)
+    engine = create_engine(app.config["SQLALCHEMY_DATABASE_URI"])
 
     # Bind session to db connection --- this is connection used by API
     db_session = scoped_session(
