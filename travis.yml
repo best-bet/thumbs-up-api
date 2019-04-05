@@ -1,0 +1,34 @@
+language: python
+sudo: required
+cache: false
+python:
+    - '3.7'
+
+addons:
+  apt:
+    packages:
+      - ca-certificates
+
+install: "make init"
+
+script:
+  - echo "Unit tests"
+  - make test
+
+after_script:
+
+  # start the web app
+  - |
+    make run-prod &
+    APP_PID=$!
+
+  # download and install ngrok
+  - curl -s https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip > ngrok.zip
+  - unzip ngrok.zip
+  - ./ngrok http 5000 > /dev/null &
+
+  # sleep to allow ngrok to initialize
+  - sleep 2
+
+  # extract the ngrok url
+  - NGROK_URL=$(curl -s localhost:4040/api/tunnels/command_line | jq --raw-output .public_url)
