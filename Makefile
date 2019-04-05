@@ -9,7 +9,7 @@ help:
 	@echo "  seed         to seed db with mock data"
 	@echo "  run          to run flask server in development"
 	@echo "  run-prod     to run flask server in production"
-	@echo "  test         to run tests on flask server"
+	@echo "  test         to run test suite on the app"
 	@echo "  test-cov     to report on test coverage
 	@echo "  freeze       to make/overwrite requirements.txt"
 	@echo "  format       to format code"
@@ -36,7 +36,9 @@ run-prod:
 		FLASK_ENV=production FLASK_APP=src:create_app flask run
 
 test:
-		FLASK_ENV=test FLASK_APP=tests.__main__:run_suite py.test
+		rm -rf .pytest/cache
+		FLASK_ENV=test py.test -v
+		rm -rf test.data.sqlite
 
 test-cov:
 		py.test --cov=thumbs-up-api --cov-report=html

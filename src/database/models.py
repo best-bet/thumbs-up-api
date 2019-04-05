@@ -37,7 +37,7 @@ class Item(Base):
     __tablename__ = "Items"
 
     id = Column(Text, primary_key=True)
-    total_num = Column(Integer, nullable=False)
+    total_num = Column(Integer, default=0,  nullable=False)
     active_trial = Column(Boolean, default=False, nullable=False)
     mab = Column(PickleType)
     next = Column(Text)
@@ -45,7 +45,6 @@ class Item(Base):
 
     def __init__(self, project_id: str, item_id: str or int):
         self.id = hash_id(project_id, item_id)
-        self.total_num = 0
 
     def __repr__(self):
         return f"id: {self.id}, total_num: {self.total_num}, next: {self.next}"

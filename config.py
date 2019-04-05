@@ -18,7 +18,7 @@ class Config(object):
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = (
         "mysql://kyleuehlein@localhost/thumbs-up-api"
-    )  # ! not this
+    )
     DEBUG = False
 
 
@@ -32,5 +32,7 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
 
 
-class TestingConfig(Config):
+class TestConfig(Config):
+    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir, "test.data.sqlite")
     TESTING = True
+    WTF_CSRF_ENABLED = False
