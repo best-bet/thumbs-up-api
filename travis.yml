@@ -32,3 +32,13 @@ after_script:
 
   # extract the ngrok url
   - NGROK_URL=$(curl -s localhost:4040/api/tunnels/command_line | jq --raw-output .public_url)
+
+  # execute the API tests
+#  - |
+#    curl -u lc0kXDIlHJOhHcN1: "https://assertible.com/deployments" -d'{
+#        "service": "89e67204-a0c3-4b03-ab99-f391748523be",
+#        "environmentName": "production",
+#        "version": "v1"
+#    }'
+#
+  - kill $APP_PID
