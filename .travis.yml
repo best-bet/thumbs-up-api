@@ -8,11 +8,11 @@ python: 3.6
 #      - ca-certificates
 
 install:
-#  - make init
+  - make init
 
 script:
   - echo "Unit tests"
-#  - make test
+  - make test
 
 after_script:
 
