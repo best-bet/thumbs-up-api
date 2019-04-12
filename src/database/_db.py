@@ -2,7 +2,7 @@
 """Database declaration file"""
 
 from flask import Flask
-# from flask_migrate import Migrate
+from flask_migrate import Migrate
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -30,7 +30,7 @@ def connect_db(app: Flask) -> scoped_session:
     Base.metadata.create_all(bind=engine)
 
     # Migrate changes in schema into database
-    # Migrate(app, engine)  # <---- currently doesnt work
+    Migrate(app, engine)  # <---- currently doesnt work
 
     # Register models
     from .models import Project, Item, Option
