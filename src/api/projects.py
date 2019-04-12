@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """RESTful projects route, contains routes for GET, POST, PATCH, and DELETE."""
 
-import sys
-
-from envelopes import Envelope
+import requests
 from flask import Blueprint, render_template, request
 from sqlalchemy.orm import scoped_session, exc
 
@@ -11,6 +9,7 @@ from sqlalchemy.orm import scoped_session, exc
 from .utils import find_project_item_option
 from ..database import Project, Item, Option
 from ..utils import hash_id, Validate
+from secrets import MAILGUN_API_KEY
 
 # TODO: handle POST case where project already exists (title)
 # TODO: implement email on project creation
@@ -18,6 +17,11 @@ from ..utils import hash_id, Validate
 # TODO: require email verification to delete project
 # TODO: error handle --- token invalid, etc.
 # TODO: implement decorators
+
+
+# Constants
+DOMAIN = "thumbsup.bestbet.tech"
+SERVER_EMAIL = "team@thumbsup.bestbet.tech"
 
 
 def projects_api_route(db_session: scoped_session) -> Blueprint:
@@ -54,7 +58,6 @@ def projects_api_route(db_session: scoped_session) -> Blueprint:
     # *************************
     @projects.route("/", methods=["POST"])
     # @limit(requests=100, window=(24 * 60 * 60 * 1000), by="ip")  # limit: 100 requests per day by ip
-    # @email
     def create_project():
         """POST - create a project given a `title`, `email` and `phone`."""
 
@@ -81,17 +84,14 @@ def projects_api_route(db_session: scoped_session) -> Blueprint:
             db_session.rollback()
             return "500 - internal server error."
 
-        # # when creating a new project, send confirmation email...
-        # envelope = Envelope(
-        #     to_addr=email,
-        #     from_addr=(u'from@example.com', u'the team at thumbs up'),
-        #     subject="Thank you for creating a new project with thumbs up!",
-        #     text_body="this works?",  # render_template('src/templates/email.txt'),
-        #     html_body=render_template('src/templates/email.html')
-        # )
-        #
-        # # Send the envelope using an ad-hoc connection...
-        # envelope.send('smtp.googlemail.com', login='kyleuehlein@gmail.com', password='notpassword', tls=True)
+        requests.post(
+            "https://api.mailgun.net/v3/sandboxd6a1edd965434a3daef3d519f980b000.mailgun.org/messages",
+            auth=("api", MAILGUN_API_KEY),
+            data={
+                  "from": f"thumbs up 👍 <{SERVER_EMAIL}>",
+                  "to": [f"{email}"],
+                  "subject": "Thank you for starting a new project on thumbs up!",
+                  "text": "Thank you :) \n\nDo not respond to this email. This email is unmonitored."})
 
         return f"<h1>title={title}, email={email}, phone={phone}, token={new_project.token}</h1>"  # not this
 
@@ -100,7 +100,6 @@ def projects_api_route(db_session: scoped_session) -> Blueprint:
     # **************************
     @projects.route("/", methods=["PATCH"])
     # @limit(requests=100, window=(24 * 60 * 60 * 1000), by="ip")  # limit: 100 requests per day by ip
-    # @email
     def update_project():
         """PATCH - edit a project given the respective fields; `title`, `email`, `phone` or `token`."""
 

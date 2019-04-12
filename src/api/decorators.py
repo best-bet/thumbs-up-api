@@ -8,21 +8,6 @@ from flask import g, jsonify, request
 
 # TODO: convert pseudo-code to working code
 
-# email sending decorator
-def email(f):
-    @functools.wraps(f)
-    def wrapped(*args, **kwargs):
-        envelope = f(*args, **kwargs)
-        envelope.from_addr = api.config["SYSTEM_EMAIL"]
-
-        def task():
-            smtp().send(envelope)
-
-        gevent.spawn(task)
-        return jsonify({"status": "OK"})
-
-    return wrapped
-
 
 # rate limiting request decorator
 def limit(requests=100, window=60, by="ip", group=None):
