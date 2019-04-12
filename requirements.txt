@@ -1,6 +1,6 @@
 alabaster==0.7.12
 alembic==1.0.8
-anaconda-client==1.7.2
+anaconda-client==1.2.2
 anaconda-navigator==1.9.6
 anaconda-project==0.8.2
 appnope==0.1.0
@@ -72,7 +72,7 @@ isort==4.3.4
 itsdangerous==1.1.0
 jdcal==1.4
 jedi==0.13.2
-Jinja2==2.10
+Jinja2==2.10.1
 jsonschema==2.6.0
 jupyter==1.0.0
 jupyter-client==5.2.4
