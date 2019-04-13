@@ -10,9 +10,12 @@ from .utils import find_project_item_option
 from ..database import Project, Item, Option
 from ..utils import hash_id, Validate
 
+# If we are in test, value will be `None`, else it will be the api key
 MAILGUN_API_KEY = None
 try:
     from secrets import MAILGUN_API_KEY
+except:
+    pass
 
 # TODO: handle POST case where project already exists (title)
 # TODO: implement email on project creation
