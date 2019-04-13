@@ -9,7 +9,10 @@ from sqlalchemy.orm import scoped_session, exc
 from .utils import find_project_item_option
 from ..database import Project, Item, Option
 from ..utils import hash_id, Validate
-from secrets import MAILGUN_API_KEY
+
+MAILGUN_API_KEY = None
+try:
+    from secrets import MAILGUN_API_KEY
 
 # TODO: handle POST case where project already exists (title)
 # TODO: implement email on project creation
@@ -84,14 +87,16 @@ def projects_api_route(db_session: scoped_session) -> Blueprint:
             db_session.rollback()
             return "500 - internal server error."
 
-        requests.post(
-            "https://api.mailgun.net/v3/sandboxd6a1edd965434a3daef3d519f980b000.mailgun.org/messages",
-            auth=("api", MAILGUN_API_KEY),
-            data={
-                  "from": f"thumbs up 👍 <{SERVER_EMAIL}>",
-                  "to": [f"{email}"],
-                  "subject": "Thank you for starting a new project on thumbs up!",
-                  "text": "Thank you :) \n\nDo not respond to this email. This email is unmonitored."})
+        # If we are not in test
+        if MAILGUN_API_KEY:
+            requests.post(
+                "https://api.mailgun.net/v3/sandboxd6a1edd965434a3daef3d519f980b000.mailgun.org/messages",
+                auth=("api", MAILGUN_API_KEY),
+                data={
+                      "from": f"thumbs up 👍 <{SERVER_EMAIL}>",
+                      "to": [f"{email}"],
+                      "subject": "Thank you for starting a new project on thumbs up!",
+                      "text": "Thank you :) \n\nDo not respond to this email. This email is unmonitored."})
 
         return f"<h1>title={title}, email={email}, phone={phone}, token={new_project.token}</h1>"  # not this
 

@@ -22,7 +22,7 @@ def create_dev_server() -> Tuple[Flask, scoped_session]:
     app = Flask(__name__)
 
     # Apply development config to flask app
-    app.config.from_object(f"config.DevelopmentConfig")
+    app.config.from_object("config.TestConfig")
 
     # route to handle killing the server
     @app.route("/kill", methods=["POST"])
