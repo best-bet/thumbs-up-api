@@ -16,8 +16,8 @@ the person merging the changes so don't worry too much.
 
 .. _community-code-of-conduct:
 
-When you're unsure, ask for help
---------------------------------
+Code of Conduct
+===============
 
 Nobody knows everything, and nobody is expected to be perfect. Asking
 questions avoids many problems down the road, and so questions are
@@ -316,7 +316,7 @@ Maintainers
 thumbs up is run and maintained by:
 
 Kyle Uehlein
-~~~~~~~~~~~
+~~~~~~~~~~~~
 
 :github: https://github.com/kuehlein
 :email: kyleuehlein@gmail.com
