@@ -181,7 +181,7 @@ Before submitting a pull request, please format your code using this command::
 
     $ make format
 
-This helps keep our repository ✨sparkly clean✨
+This helps keep our repository ✨sparkly clean ✨
 
 .. _`Pull Requests`: http://help.github.com/send-pull-requests/
 
