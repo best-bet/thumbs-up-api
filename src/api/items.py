@@ -133,7 +133,7 @@ def items_api_route(db_session: scoped_session) -> Blueprint:
             return "There must be at least two options for each item to run a trial."
 
         # Create a new instance of th MAB test class, pickle it, and store it in the db
-        pickled_mab = pickle.dumps(MAB(num_bandits=query_data["item"].total_num))
+        pickled_mab = pickle.dumps(MAB(num_bandits=query_data["item"].total_num, live=True))
         query_data["item"].mab = pickled_mab
         query_data["item"].active_trial = True
 
