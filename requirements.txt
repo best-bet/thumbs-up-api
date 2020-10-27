@@ -8,7 +8,7 @@ cffi==1.12.2
 chardet==3.0.4
 Click==7.0
 coverage==4.5.3
-cryptography==2.6.1
+cryptography==3.2
 entrypoints==0.3
 Envelopes==0.4
 Faker==1.0.4
