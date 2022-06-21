@@ -27,7 +27,7 @@ Mako==1.0.8
 MarkupSafe==1.1.1
 mccabe==0.6.1
 more-itertools==7.0.0
-numpy==1.16.2
+numpy==1.22.0
 pathtools==0.1.2
 pluggy==0.9.0
 py==1.8.0
